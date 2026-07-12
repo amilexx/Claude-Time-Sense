@@ -29,7 +29,7 @@ This is *context injection* — an intended, documented mechanism, not "prompt i
 ## Install
 
 ```bash
-git clone https://github.com/<you>/time-sense ~/.claude/skills/time-sense
+git clone https://github.com/amilexx/Claude-Time-Sense
 cd ~/.claude/skills/time-sense
 bash install.sh full     # or: light
 ```
