@@ -24,6 +24,13 @@ $dest      = Join-Path $claudeDir "time-sense"
 $src       = Split-Path -Parent $MyInvocation.MyCommand.Path
 $mark      = "time-sense"
 
+# Write UTF-8 WITHOUT a BOM. Windows PowerShell 5.1's `Out-File -Encoding utf8` prepends a
+# BOM (EF BB BF); Claude Code parses settings.json with a strict JSON reader that rejects it,
+# so the hooks silently never load. This helper behaves identically on PS 5.1 and PS 7+.
+function Write-Utf8NoBom([string]$path, [string]$content) {
+    [System.IO.File]::WriteAllText($path, $content, (New-Object System.Text.UTF8Encoding $false))
+}
+
 # PS 5.1's ConvertFrom-Json yields PSCustomObject, which is painful to mutate.
 # Normalise the whole tree to hashtables/arrays first.
 function ConvertTo-Hash($o) {
@@ -80,7 +87,7 @@ if ($Mode -eq "status") {
 }
 
 if (-not (Test-Path $claudeDir)) { New-Item -ItemType Directory -Path $claudeDir -Force | Out-Null }
-if (-not (Test-Path $settings)) { "{}" | Out-File -FilePath $settings -Encoding utf8 }
+if (-not (Test-Path $settings)) { Write-Utf8NoBom $settings "{}" }
 Copy-Item $settings "$settings.bak.$(Get-Date -Format 'yyyyMMddHHmmss')"
 
 $cfg = Get-Settings
@@ -141,7 +148,7 @@ if ($Mode -ne "remove") {
 
 if ($hooks.Count -eq 0) { $cfg.Remove("hooks") }
 
-($cfg | ConvertTo-Json -Depth 10) | Out-File -FilePath $settings -Encoding utf8
+Write-Utf8NoBom $settings ($cfg | ConvertTo-Json -Depth 10)
 
 if ($Mode -eq "remove") {
     if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }

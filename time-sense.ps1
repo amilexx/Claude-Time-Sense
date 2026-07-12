@@ -61,7 +61,9 @@ function Get-LastOf([string]$label) {
 }
 
 function Add-Record([string]$label) {
-    "$nowEpoch`t$nowDay`t$label`t$session" | Out-File -FilePath $log -Append -Encoding utf8
+    # AppendAllText with a BOM-less UTF-8 encoder: Out-File -Encoding utf8 on PS 5.1 would
+    # stamp a BOM onto the first record, corrupting the epoch in field 0 when it's read back.
+    [System.IO.File]::AppendAllText($log, "$nowEpoch`t$nowDay`t$label`t$session`r`n", (New-Object System.Text.UTF8Encoding $false))
 }
 
 if ($Event -eq "done") {
