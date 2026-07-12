@@ -43,8 +43,12 @@ session=$(printf '%s' "$raw" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*
 [ -z "$session" ] && session="unknown"
 
 now_epoch=$(date +%s)
-now_human=$(date '+%Y-%m-%d %H:%M:%S %Z (%A)')
 now_day=$(date '+%Y-%m-%d')
+# %Z (zone abbreviation) comes out as blank whitespace under Git Bash/MSYS on Windows — not an
+# empty string — so test for a non-space char and fall back to the numeric offset (%z, +0200).
+now_tz=$(date '+%Z')
+printf '%s' "$now_tz" | grep -q '[^[:space:]]' || now_tz=$(date '+%z')
+now_human=$(date "+%Y-%m-%d %H:%M:%S${now_tz:+ $now_tz} (%A)")
 
 DOCTRINE_FULL="Use this for chronological coherence, real durations and deadlines. NEVER comment on the user's sleep, fatigue, energy or the lateness of the hour, and never suggest a break, rest, or picking this up tomorrow — whatever the clock says."
 DOCTRINE_SHORT="Time is for coherence and deadlines only — never comment on sleep, fatigue or the late hour."
