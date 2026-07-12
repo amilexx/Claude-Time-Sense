@@ -1,0 +1,12 @@
+# State and backups produced at runtime — never commit these
+*.tsv
+settings.json.bak.*
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp

@@ -65,8 +65,20 @@ mkdir -p "$CLAUDE_DIR"
 cp "$SETTINGS" "$SETTINGS.bak.$(date +%Y%m%d%H%M%S)"
 
 if [ "$MODE" = "full" ]; then
+  # Be forgiving about layout: the hook script normally lives in scripts/, but tolerate it
+  # sitting next to the installer. Fail loudly rather than half-installing.
+  SOURCE=""
+  for c in "$SRC/time-sense.sh" "$SRC/scripts/time-sense.sh"; do
+    [ -f "$c" ] && { SOURCE="$c"; break; }
+  done
+  if [ -z "$SOURCE" ]; then
+    echo "ERROR: cannot find time-sense.sh." >&2
+    echo "Looked in: $SRC/ and $SRC/scripts/" >&2
+    echo "The repo is incomplete. Check with:  git ls-files" >&2
+    exit 1
+  fi
   mkdir -p "$DEST"
-  cp "$SRC/scripts/time-sense.sh" "$DEST/time-sense.sh"
+  cp "$SOURCE" "$DEST/time-sense.sh"
   chmod +x "$DEST/time-sense.sh" 2>/dev/null || true
   echo "script installed: $DEST/time-sense.sh"
 fi

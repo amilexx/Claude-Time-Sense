@@ -99,8 +99,25 @@ foreach ($event in @("UserPromptSubmit", "Stop")) {
 }
 
 if ($Mode -ne "remove") {
+    # The hook script sits next to this installer. Tolerate a legacy scripts/ layout too,
+    # and fail loudly rather than half-installing.
+    $candidates = @(
+        (Join-Path $src "time-sense.ps1"),
+        (Join-Path $src "scripts\time-sense.ps1")
+    )
+    $source = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $source) {
+        Write-Output "ERROR: cannot find time-sense.ps1."
+        Write-Output "Looked in:"
+        $candidates | ForEach-Object { Write-Output "  $_" }
+        Write-Output ""
+        Write-Output "The repo is incomplete. Check with:  git ls-files"
+        Write-Output "Expected: time-sense.ps1 next to install.ps1"
+        exit 1
+    }
+
     if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
-    Copy-Item (Join-Path $src "scripts\time-sense.ps1") (Join-Path $dest "time-sense.ps1") -Force
+    Copy-Item $source (Join-Path $dest "time-sense.ps1") -Force
     $script = Join-Path $dest "time-sense.ps1"
     Write-Output "script installed: $script"
 
