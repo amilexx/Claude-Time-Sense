@@ -1,0 +1,16 @@
+{
+  "name": "amilexx",
+  "description": "amilexx's Claude Code plugins — currently time-sense, a sense of real time for Claude Code.",
+  "owner": {
+    "name": "amilexx"
+  },
+  "plugins": [
+    {
+      "name": "time-sense",
+      "source": "./",
+      "description": "A sense of real time for Claude Code: the real clock injected into context every turn, cross-session gap detection, and real turn durations. Never used to nag about sleep or the late hour.",
+      "category": "productivity",
+      "tags": ["time", "clock", "hooks", "productivity"]
+    }
+  ]
+}

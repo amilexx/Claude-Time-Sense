@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "time-sense",
+  "description": "A sense of real time for Claude Code: injects the system clock into context on every message, detects cross-session gaps, and measures real turn durations. Explicitly forbids using the clock to nag about sleep or the late hour.",
+  "version": "1.0.0",
+  "author": {
+    "name": "amilexx"
+  },
+  "homepage": "https://github.com/amilexx/Claude-Time-Sense",
+  "repository": "https://github.com/amilexx/Claude-Time-Sense",
+  "license": "MIT",
+  "keywords": [
+    "time",
+    "clock",
+    "hooks",
+    "context-injection",
+    "session-continuity",
+    "productivity"
+  ]
+}

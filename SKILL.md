@@ -24,9 +24,11 @@ This is *context injection*, an intended, documented mechanism — not "prompt i
 
 ## First run: check that the hooks are actually live
 
-**Reading this file does nothing on its own.** All the value lives in hooks inside `settings.json`. So the first time this skill comes up in a project, verify the wiring. The installer sits in this skill's own directory, right next to this `SKILL.md` — there is nothing to download.
+**Reading this file does nothing on its own.** The value lives in a `UserPromptSubmit` hook — the skill is just this guidance. The hook fires automatically on every message; it is never model-invoked. So the only thing to verify is that the hook is wired in.
 
-Pick the installer for the platform:
+**Fastest check — look at your own context.** If a `<time-sense>` block is already appearing on the user's messages, the hook is live. Nothing to do. Carry on with the user's actual task. (This is the normal state when time-sense is installed as a **plugin**: Claude Code manages the hook itself, and running any `install.*` script would only add a *second*, duplicate hook — don't.)
+
+Only if **no** block is showing up, and time-sense is installed **standalone** (cloned into `~/.claude/skills/`, not via `/plugin install`), fall back to the installer. It sits in this skill's own directory, next to this `SKILL.md` — nothing to download.
 
 ```bash
 bash <this-skill-dir>/install.sh status              # macOS, Linux, WSL, Git Bash
@@ -41,7 +43,7 @@ On Windows, Claude Code's Bash tool *is* Git Bash, where a bare `powershell` is 
 "$SYSTEMROOT/System32/WindowsPowerShell/v1.0/powershell.exe" -File <this-skill-dir>/install.ps1 status
 ```
 
-- **Prints `INSTALLED: version A` or `version B`** → nothing to do. Carry on with the user's actual task.
+- **Prints `INSTALLED: version A` or `version B`** → nothing to do.
 - **Prints `NOT INSTALLED`** → offer to set it up. Ask which version (see the table below), run the installer with `light` or `full`, then tell the user to **restart Claude Code** — hook config is snapshotted at session start, so it won't take effect until then.
 
 Ask before installing rather than doing it silently: writing to `settings.json` is a change to the user's configuration, and they should choose A or B knowingly. It's one short question, not an obstacle.

@@ -28,7 +28,24 @@ This is *context injection* — an intended, documented mechanism, not "prompt i
 
 ## Install
 
-The skill directory **must** be named `time-sense` (that's the skill's declared name), even though the repo is `Claude-Time-Sense`. Pass the target explicitly — don't let `git clone` pick the name for you.
+### Recommended: as a plugin
+
+This repo is also a Claude Code **plugin** (and its own marketplace), so the whole thing installs in two lines — no `git clone`, no install script, and Claude Code wires the hook for you, cross-platform:
+
+```
+/plugin marketplace add amilexx/Claude-Time-Sense
+/plugin install time-sense@amilexx
+```
+
+Then **restart Claude Code** (or run `/reload-plugins`). That's it — the clock starts injecting on every message. Updates come automatically when the plugin's `version` is bumped; remove it with `/plugin uninstall time-sense@amilexx`.
+
+The plugin ships **version B** behaviour (real clock every turn + cross-session gap detection + real turn durations). It writes one small TSV log to `~/.claude/time-sense.tsv` and nothing else.
+
+Why the plugin route is cleaner on Windows: Claude Code runs hooks through Git Bash, so the plugin invokes the portable **bash** hook (`time-sense.sh`) — no PowerShell, no PATH surprises, and Claude Code manages the config so there's no `settings.json` BOM pitfall.
+
+### Alternative: standalone install script
+
+If you'd rather not use the plugin system (or want to pick **version A** — pure injection, zero state), clone it as a skill and run the installer. The directory **must** be named `time-sense` — pass the target explicitly.
 
 **macOS / Linux / WSL / Git Bash**
 
@@ -50,7 +67,7 @@ Then **restart Claude Code** — hook config is snapshotted at session start. Co
 
 The installer *merges* into `settings.json`: your existing hooks are preserved, and a timestamped `.bak` is written before any change.
 
-Installed as a skill, it also self-checks: the first time it comes up, Claude runs the installer's `status` command and offers to wire the hooks if they aren't live yet.
+> **Don't install both ways at once.** The plugin and the standalone installer each register their own hook — running both means the clock is injected twice per message. Pick one.
 
 ### Platform notes
 
