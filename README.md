@@ -28,17 +28,40 @@ This is *context injection* — an intended, documented mechanism, not "prompt i
 
 ## Install
 
+The skill directory **must** be named `time-sense` (that's the skill's declared name), even though the repo is `Claude-Time-Sense`. Pass the target explicitly — don't let `git clone` pick the name for you.
+
+**macOS / Linux / WSL / Git Bash**
+
 ```bash
-git clone https://github.com/amilexx/Claude-Time-Sense
+git clone https://github.com/amilexx/Claude-Time-Sense ~/.claude/skills/time-sense
 cd ~/.claude/skills/time-sense
 bash install.sh full     # or: light
 ```
 
+**Native Windows (PowerShell)**
+
+```powershell
+git clone https://github.com/amilexx/Claude-Time-Sense "$env:USERPROFILE\.claude\skills\time-sense"
+cd "$env:USERPROFILE\.claude\skills\time-sense"
+.\install.ps1 full       # or: light
+```
+
 Then **restart Claude Code** — hook config is snapshotted at session start. Confirm with `/hooks`.
 
-The installer *merges* into `~/.claude/settings.json`: your existing hooks are preserved, and a timestamped `.bak` is written before any change. `python3` is required for the JSON merge.
+The installer *merges* into `settings.json`: your existing hooks are preserved, and a timestamped `.bak` is written before any change.
 
-Installed as a skill, it also self-checks: the first time it comes up, Claude runs `install.sh status` and offers to wire the hooks if they aren't live yet.
+Installed as a skill, it also self-checks: the first time it comes up, Claude runs the installer's `status` command and offers to wire the hooks if they aren't live yet.
+
+### Platform notes
+
+Claude Code on Windows uses Git Bash for its Bash tool when Git for Windows is present, and falls back to the PowerShell tool otherwise. `install.ps1` sidesteps the question entirely: it registers hooks that invoke `powershell.exe -File`, which parses identically whether the hook is spawned by Git Bash, cmd, or PowerShell.
+
+One consequence: on Windows, version A ships as a small stateless script rather than an inline command, because inline commands with nested quotes behave differently across those three shells. It still keeps **no state and no log** — that's the real distinction between A and B.
+
+| | `install.sh` | `install.ps1` |
+|---|---|---|
+| Requires | `bash`, `python3` | PowerShell 5.1+ (built into Windows) |
+| Version A footprint | zero files — one inline command | one stateless script, no log |
 
 ## Two versions
 
@@ -66,6 +89,13 @@ bash install.sh full     # version B
 bash install.sh remove   # clean uninstall (leaves third-party hooks intact)
 ```
 
+```powershell
+.\install.ps1 status     # same four commands on native Windows
+.\install.ps1 light
+.\install.ps1 full
+.\install.ps1 remove
+```
+
 ## Tuning
 
 | Variable | Default | Meaning |
@@ -79,6 +109,7 @@ The clock is for **coherence and usefulness, not surveillance**. Whatever the ho
 
 ## Known issues
 
+- **`bash: command not found` on Windows.** Use `.\install.ps1` instead, or run from Git Bash.
 - **Nothing appears in context.** A bug has been reported where `UserPromptSubmit` injection doesn't reach the model in the **VSCode extension** while working fine in the CLI. Test in a terminal first.
 - **Nothing happens after installing.** Restart Claude Code; hook config is only read at session start.
 

@@ -24,14 +24,19 @@ This is *context injection*, an intended, documented mechanism — not "prompt i
 
 ## First run: check that the hooks are actually live
 
-**Reading this file does nothing on its own.** All the value lives in hooks inside `settings.json`. So the first time this skill comes up in a project, verify the wiring. `install.sh` sits in this skill's own directory, right next to this `SKILL.md` — there is nothing to download.
+**Reading this file does nothing on its own.** All the value lives in hooks inside `settings.json`. So the first time this skill comes up in a project, verify the wiring. The installer sits in this skill's own directory, right next to this `SKILL.md` — there is nothing to download.
+
+Pick the installer for the platform:
 
 ```bash
-bash <this-skill-dir>/install.sh status
+bash <this-skill-dir>/install.sh status              # macOS, Linux, WSL, Git Bash
+```
+```powershell
+powershell -File <this-skill-dir>\install.ps1 status  # native Windows
 ```
 
 - **Prints `INSTALLED: version A` or `version B`** → nothing to do. Carry on with the user's actual task.
-- **Prints `NOT INSTALLED`** → offer to set it up. Ask which version (see the table below), run `bash <this-skill-dir>/install.sh light` or `... full`, then tell the user to **restart Claude Code** — hook config is snapshotted at session start, so it won't take effect until then.
+- **Prints `NOT INSTALLED`** → offer to set it up. Ask which version (see the table below), run the installer with `light` or `full`, then tell the user to **restart Claude Code** — hook config is snapshotted at session start, so it won't take effect until then.
 
 Ask before installing rather than doing it silently: writing to `settings.json` is a change to the user's configuration, and they should choose A or B knowingly. It's one short question, not an obstacle.
 
