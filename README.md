@@ -54,9 +54,12 @@ Installed as a skill, it also self-checks: the first time it comes up, Claude ru
 
 ### Platform notes
 
-Claude Code on Windows uses Git Bash for its Bash tool when Git for Windows is present, and falls back to the PowerShell tool otherwise. `install.ps1` sidesteps the question entirely: it registers hooks that invoke `powershell.exe -File`, which parses identically whether the hook is spawned by Git Bash, cmd, or PowerShell.
+Claude Code on Windows runs **hook commands through Git Bash** (`/usr/bin/bash`), even when your `defaultShell` is `powershell`. That has two consequences the installer handles for you:
 
-One consequence: on Windows, version A ships as a small stateless script rather than an inline command, because inline commands with nested quotes behave differently across those three shells. It still keeps **no state and no log** — that's the real distinction between A and B.
+- **`powershell` is not on Git Bash's PATH.** A hook that calls a bare `powershell …` dies with `powershell: command not found` and injects nothing. So `install.ps1` registers the **absolute path** to `powershell.exe` with forward slashes — `"C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe" -File …` — which runs verbatim whether the hook is spawned by Git Bash, cmd, or PowerShell.
+- **No BOM in `settings.json`.** Windows PowerShell 5.1's `Out-File -Encoding utf8` prepends a UTF-8 byte-order mark, and Claude Code's JSON parser rejects a leading BOM — silently disabling *every* hook in the file. The installer writes BOM-less UTF-8 instead.
+
+One more Windows detail: version A ships as a small stateless script rather than an inline command, because inline commands with nested quotes behave differently across shells. It still keeps **no state and no log** — that's the real distinction between A and B.
 
 | | `install.sh` | `install.ps1` |
 |---|---|---|

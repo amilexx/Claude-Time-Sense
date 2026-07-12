@@ -1,0 +1,9 @@
+# Shell scripts MUST stay LF: a CRLF shebang (`#!/usr/bin/env bash\r`) breaks on macOS/Linux
+# even when the repo is cloned on Windows.
+*.sh text eol=lf
+
+# PowerShell tolerates either; normalise to CRLF so Windows editors leave it alone.
+*.ps1 text eol=crlf
+
+# Docs: normalise line endings on checkin, let git pick native on checkout.
+*.md text

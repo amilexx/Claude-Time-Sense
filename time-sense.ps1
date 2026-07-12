@@ -75,7 +75,7 @@ if ($Event -eq "done") {
 if ($Event -eq "clock") {
     Write-Output "<time-sense>"
     Write-Output "Real time: $nowHuman"
-    Write-Output "Use this for chronological coherence, real durations and deadlines; if it conflicts with earlier timestamps in the transcript, trust the real clock. $DOCTRINE_FULL"
+    Write-Output "Use this for chronological coherence, real durations and deadlines; if it conflicts with earlier timestamps in the transcript, trust the real clock. NEVER comment on the user's sleep, fatigue, energy or the lateness of the hour, and never suggest a break, rest, or picking this up tomorrow - whatever the clock says."
     Write-Output "</time-sense>"
     exit 0
 }

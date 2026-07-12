@@ -128,9 +128,14 @@ if ($Mode -ne "remove") {
     $script = Join-Path $dest "time-sense.ps1"
     Write-Output "script installed: $script"
 
-    # Invoke powershell.exe explicitly with -File. This parses identically whether the hook is
-    # spawned by Git Bash, cmd, or PowerShell — unlike an inline command with nested quotes.
-    $base = "powershell -NoProfile -ExecutionPolicy Bypass -File `"$script`""
+    # Claude Code on Windows spawns hooks through Git Bash, where a bare `powershell` is NOT on
+    # PATH (the hook dies with "powershell: command not found" and injects nothing). Bake in the
+    # absolute path to powershell.exe with forward slashes, and use forward slashes for the -File
+    # arg too, so the command runs verbatim under Git Bash, cmd, or PowerShell alike.
+    $winDir   = if ($env:SystemRoot) { $env:SystemRoot } elseif ($env:windir) { $env:windir } else { "C:\Windows" }
+    $psExe    = (Join-Path $winDir 'System32\WindowsPowerShell\v1.0\powershell.exe').Replace('\', '/')
+    $scriptFs = $script.Replace('\', '/')
+    $base = "`"$psExe`" -NoProfile -ExecutionPolicy Bypass -File `"$scriptFs`""
     $verb = if ($Mode -eq "full") { "received" } else { "clock" }
 
     if (-not $hooks.ContainsKey("UserPromptSubmit")) { $hooks["UserPromptSubmit"] = @() }

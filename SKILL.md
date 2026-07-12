@@ -35,6 +35,12 @@ bash <this-skill-dir>/install.sh status              # macOS, Linux, WSL, Git Ba
 powershell -File <this-skill-dir>\install.ps1 status  # native Windows
 ```
 
+On Windows, Claude Code's Bash tool *is* Git Bash, where a bare `powershell` is off PATH — if `status` fails with `powershell: command not found`, call it by absolute path instead:
+
+```bash
+"$SYSTEMROOT/System32/WindowsPowerShell/v1.0/powershell.exe" -File <this-skill-dir>/install.ps1 status
+```
+
 - **Prints `INSTALLED: version A` or `version B`** → nothing to do. Carry on with the user's actual task.
 - **Prints `NOT INSTALLED`** → offer to set it up. Ask which version (see the table below), run the installer with `light` or `full`, then tell the user to **restart Claude Code** — hook config is snapshotted at session start, so it won't take effect until then.
 
