@@ -30,7 +30,14 @@ mkdir -p "$(dirname "$LOG")" 2>/dev/null
 # Hooks receive JSON on stdin. Read it without depending on jq, and never block waiting.
 raw=""
 if [ ! -t 0 ]; then
-  raw=$(timeout 1 cat 2>/dev/null || true)
+  # `timeout` is GNU coreutils and absent on stock macOS; fall back to a plain read there.
+  # Claude Code closes stdin after sending the hook JSON, so `cat` returns at EOF on its own —
+  # the timeout is only a defensive guard against a stray open pipe.
+  if command -v timeout >/dev/null 2>&1; then
+    raw=$(timeout 1 cat 2>/dev/null || true)
+  else
+    raw=$(cat 2>/dev/null || true)
+  fi
 fi
 session=$(printf '%s' "$raw" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 [ -z "$session" ] && session="unknown"
